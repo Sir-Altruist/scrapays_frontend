@@ -6,32 +6,6 @@ import { useNavigate } from "react-router";
 import Helpers from '@/helpers';
 import { FETCH_PROFILE } from "@/api/auth";
 
-export interface BooksResponse {
-    findBooks: {
-        books: {
-            id: number
-            name: string
-            description: string
-        }[]
-        message: string
-        status: string
-        code: number
-    }
-}
-
-export interface ProfileResponse {
-    fetchProfile: {
-        user: {
-            id: number
-            username: string
-            email: string
-        }
-        message: string
-        status: string
-        code: number
-    }
-}
-
 
 const Dashboard = () => {
     const [selectedBook, setSelectedBook] = useState(null)
@@ -127,7 +101,7 @@ const Dashboard = () => {
             <Box as={'div'} width={'100%'} display={'flex'} justifyContent={'space-between'}>
                 <Button backgroundColor={'blue.500'} onClick={() => handleModal("open")}>Upload Book</Button>
                 <Box>
-                    <Heading as={'h3'}>Hi {userData?.username}👋! What are you uploading today?</Heading>
+                    <Heading as={'h3'}>Hi {userData?.username}👋! What will you be uploading today?</Heading>
                 </Box>
                 <Button backgroundColor={'red.500'} onClick={() => logout()}>Logout</Button>
             </Box>
