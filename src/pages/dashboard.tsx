@@ -1,9 +1,10 @@
 import { FETCH_BOOKS } from "@/api/book";
-import { useQuery } from "@apollo/client"
-import { Box, Button, Spinner, Table, useDialog } from "@chakra-ui/react"
-import { useState } from "react"
+import { useApolloClient } from "@apollo/client"
+import { Box, Button, Heading, Spinner, Table, useDialog } from "@chakra-ui/react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router";
 import Helpers from '@/helpers';
+import { FETCH_PROFILE } from "@/api/auth";
 
 export interface BooksResponse {
     findBooks: {
@@ -18,14 +19,32 @@ export interface BooksResponse {
     }
 }
 
+export interface ProfileResponse {
+    fetchProfile: {
+        user: {
+            id: number
+            username: string
+            email: string
+        }
+        message: string
+        status: string
+        code: number
+    }
+}
 
 
 const Dashboard = () => {
     const [selectedBook, setSelectedBook] = useState(null)
-    const { loading, data } = useQuery<BooksResponse>(FETCH_BOOKS)
     const navigate = useNavigate()
+    const client = useApolloClient()
+    const mounted = useRef(false)
 
-    const { setOpen, open } = useDialog();
+    const [loading, setLoading] = useState(false)
+    const [books, setBooks] = useState<any>([])
+    const [userData, setUserData] = useState({
+        username: ''
+    })
+    const { setOpen, open,  } = useDialog();
     const { setOpen: setOpenUpdate, open: openUpdate } = useDialog();
     const { setOpen: setOpenDelete, open: openDelete } = useDialog();
     const handleModal = (action: string) => {
@@ -42,23 +61,74 @@ const Dashboard = () => {
         action === "open" && setSelectedBook(data)
     }
 
+    useEffect(() => {
+        mounted.current = true
+        const fetchBooks = async () => {
+            const token = localStorage.getItem('access_token')
+            if(!token){
+                navigate('/login')
+                return;
+            }
 
-    // if(error?.cause?.['code'] === 403){
-    //     localStorage.removeItem('access_token')
-    //     navigate('/login')
-    // }
+            try {
+                setLoading(true)
+                const { data, error } = await client.query({
+                    query: FETCH_BOOKS,
+                    context: {
+                      headers: {
+                        Authorization: `Bearer ${token}`
+                      }
+                    }
+                });
 
+                const { data: profileData } = await client.query({
+                    query: FETCH_PROFILE,
+                    context: {
+                      headers: {
+                        Authorization: `Bearer ${token}`
+                      }
+                    }
+                });
+                if(error?.cause?.['code'] === 403 || error?.cause?.['code'] === 401){
+                    navigate('/login')
+                    localStorage.removeItem('access_token')
+                }
+                setBooks(data?.findBooks?.books || []);
+                setUserData(prev => ({
+                    ...prev,
+                    username: profileData?.fetchProfile?.user?.username
+                }))
+
+            } catch (error) {
+                localStorage.removeItem('access_token');
+                navigate('/login');
+                setLoading(false);
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchBooks()
+
+        return () => {
+            mounted.current = false
+        }
+    }, [navigate])
     const logout = () => {
         localStorage.removeItem('access_token')
         navigate('/login')
     }
 
-    if(loading) return <Spinner />;
+    if(loading) return <Box display={'flex'} justifyContent={'center'} alignItems={'center'}>
+        <Spinner size={"xl"} marginTop={'300px'} />;
+    </Box>
   return (
     <Box width={'100%'} height={'100%'} paddingTop={'150px'} display={'flex'} justifyContent={'center'}>
         <Box as={'div'} width={'60%'}>
             <Box as={'div'} width={'100%'} display={'flex'} justifyContent={'space-between'}>
                 <Button backgroundColor={'blue.500'} onClick={() => handleModal("open")}>Upload Book</Button>
+                <Box>
+                    <Heading as={'h3'}>Hi {userData?.username}👋! What are you uploading today?</Heading>
+                </Box>
                 <Button backgroundColor={'red.500'} onClick={() => logout()}>Logout</Button>
             </Box>
             <Table.Root striped width={'100%'} marginTop={'20px'}>
@@ -72,11 +142,11 @@ const Dashboard = () => {
                 </Table.Header>
                 <Table.Body>
                     {
-                        data?.findBooks?.books.map((book, i) => (
+                        books.map((book, i) => (
                             <Table.Row key={i}>
                             <Table.Cell textAlign={'center'}>{i + 1}</Table.Cell>
-                            <Table.Cell textAlign={'center'}>{book.name}</Table.Cell>
-                            <Table.Cell textAlign={'center'}>{book.description}</Table.Cell>
+                            <Table.Cell textAlign={'center'}>{book?.name}</Table.Cell>
+                            <Table.Cell textAlign={'center'}>{book?.description}</Table.Cell>
                             <Table.Cell display={'flex'} gap={'10px'} justifyContent={'center'} alignItems={'center'}>
                                 <Button backgroundColor={'green.400'} onClick={() => handleUpdateDataModal("open", book)}>Update</Button>
                                 <Button backgroundColor={'red.500'} onClick={() => handleDeleteModal("open", book)}>Delete</Button>

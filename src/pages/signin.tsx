@@ -6,7 +6,8 @@ import {
   Input,
   Heading,
   Stack,
-  Text
+  Text,
+  Image
 } from '@chakra-ui/react';
 import { Field } from "@/components/ui/field"
 import { useMutation } from '@apollo/client';
@@ -14,6 +15,7 @@ import { SEND_OTP, SIGN_IN } from '@/api/auth';
 import { Alert } from '@/components/ui/alert';
 import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
+import Logo from "../assets/icon.png"
 
 
 // Signup DTO Interface
@@ -116,7 +118,7 @@ const Signup: React.FC = () => {
     
   return (
     <Box width={'100%'} height={'100%'} paddingTop={'200px'}>
-        {error && display && <Alert width={'400px'} margin={'0 auto 20px'} status={data ? "success" : "error"}>{otpSent ? error?.message : otpError?.message}</Alert>}
+        {(error || otpError) && display && <Alert width={'400px'} margin={'0 auto 20px'} status={data ? "success" : "error"}>{otpSent ? error?.message : otpError?.message}</Alert>}
         {data && display &&  <Alert width={'400px'} margin={'0 auto 20px'} status={"success"}>{data?.signIn?.message}</Alert>}
         <Box 
             background={'white'} 
@@ -131,8 +133,8 @@ const Signup: React.FC = () => {
             boxShadow="lg"
         >
         <Heading mb={2}  textAlign={'center'} color={'black'}>Welcome to Scrapays Bookstore</Heading>
-        <Heading mb={6} textAlign={'center'} color={'black'}>Sign In</Heading>
-        <form style={{ margin: '50px 0 10px'}}>
+        <Image src={Logo} alt='logo' width={'60px'} height={'60px'} margin={'10px auto'} />
+        <form style={{ margin: '30px 0 10px'}}>
             <Stack spaceY={2}>
                 <Field>
                     <Input 

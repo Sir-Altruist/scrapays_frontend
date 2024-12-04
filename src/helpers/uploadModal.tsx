@@ -66,11 +66,21 @@ export const Modal = ({ open, handleModal }: any) => {
     }
 
     const handleUpload = async () => {
+        const token = localStorage.getItem('access_token')
+        if(!token){
+          navigate('/login')
+          return;
+        }
         try {
             setLoading(true)
             const result = await createBook({
                 variables: {
                   createInput: { name, description }
+                },
+                context: {
+                  headers: {
+                    Authorization: `Bearer ${token}`
+                  }
                 }
             })
             if(result?.errors?.['code'] === 403){
@@ -90,18 +100,7 @@ export const Modal = ({ open, handleModal }: any) => {
         }
     }
   return (
-          <DialogRoot size={"sm"} open={open}>
-            {/* <DialogTrigger asChild> */}
-            {/* <Button 
-            variant="outline" 
-            size="sm"
-            position="absolute"
-            top="10px"
-            left="10px"
-            >
-              Upload Book
-            </Button> */}
-            {/* </DialogTrigger> */}
+          <DialogRoot size={"sm"} open={open} onOpenChange={() => handleModal("close")}>
             <DialogBackdrop />
             <DialogContent>
               <DialogHeader>
