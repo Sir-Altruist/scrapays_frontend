@@ -116,7 +116,7 @@ const Signup: React.FC = () => {
     
   return (
     <Box width={'100%'} height={'100%'} paddingTop={'200px'}>
-        {error && display && <Alert width={'400px'} margin={'0 auto 20px'} status={data ? "success" : "error"}>{otpSent ? error?.message : otpError?.message}</Alert>}
+        {(error || otpError) && display && <Alert width={'400px'} margin={'0 auto 20px'} status={data ? "success" : "error"}>{otpSent ? error?.message : otpError?.message}</Alert>}
         {data && display &&  <Alert width={'400px'} margin={'0 auto 20px'} status={"success"}>{data?.signIn?.message}</Alert>}
         <Box 
             background={'white'} 

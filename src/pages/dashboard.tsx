@@ -1,7 +1,7 @@
 import { FETCH_BOOKS } from "@/api/book";
-import { useQuery } from "@apollo/client"
+import { useQuery, useApolloClient } from "@apollo/client"
 import { Box, Button, Spinner, Table, useDialog } from "@chakra-ui/react"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router";
 import Helpers from '@/helpers';
 
@@ -22,8 +22,13 @@ export interface BooksResponse {
 
 const Dashboard = () => {
     const [selectedBook, setSelectedBook] = useState(null)
-    const { loading, data } = useQuery<BooksResponse>(FETCH_BOOKS)
+    // const { loading, data } = useQuery<BooksResponse>(FETCH_BOOKS)
     const navigate = useNavigate()
+    const client = useApolloClient()
+    const mounted = useRef(false)
+
+    const [loading, setLoading] = useState(false)
+    const [books, setBooks] = useState<any>([])
 
     const { setOpen, open } = useDialog();
     const { setOpen: setOpenUpdate, open: openUpdate } = useDialog();
@@ -48,12 +53,52 @@ const Dashboard = () => {
     //     navigate('/login')
     // }
 
+    useEffect(() => {
+        mounted.current = true
+        const fetchBooks = async () => {
+            setLoading(true)
+            const token = localStorage.getItem('access_token')
+            if(!token){
+                navigate('/login')
+                return;
+            }
+
+            try {
+                const { data, error } = await client.query({
+                    query: FETCH_BOOKS,
+                    context: {
+                      headers: {
+                        Authorization: `Bearer ${token}`
+                      }
+                    }
+                });
+                if(error?.cause?.['code'] === 403 || error?.cause?.['code'] === 401){
+                    navigate('/login')
+                    localStorage.removeItem('access_token')
+                }
+                setBooks(data?.findBooks?.books || []); 
+            } catch (error) {
+                localStorage.removeItem('access_token');
+                navigate('/login');
+                setLoading(false);
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchBooks()
+
+        return () => {
+            mounted.current = false
+        }
+    }, [navigate])
     const logout = () => {
         localStorage.removeItem('access_token')
         navigate('/login')
     }
 
-    if(loading) return <Spinner />;
+    if(loading) return <Box display={'flex'} justifyContent={'center'} alignItems={'center'}>
+        <Spinner size={"xl"} marginTop={'300px'} />;
+    </Box>
   return (
     <Box width={'100%'} height={'100%'} paddingTop={'150px'} display={'flex'} justifyContent={'center'}>
         <Box as={'div'} width={'60%'}>
@@ -72,11 +117,11 @@ const Dashboard = () => {
                 </Table.Header>
                 <Table.Body>
                     {
-                        data?.findBooks?.books.map((book, i) => (
+                        books.map((book, i) => (
                             <Table.Row key={i}>
                             <Table.Cell textAlign={'center'}>{i + 1}</Table.Cell>
-                            <Table.Cell textAlign={'center'}>{book.name}</Table.Cell>
-                            <Table.Cell textAlign={'center'}>{book.description}</Table.Cell>
+                            <Table.Cell textAlign={'center'}>{book?.name}</Table.Cell>
+                            <Table.Cell textAlign={'center'}>{book?.description}</Table.Cell>
                             <Table.Cell display={'flex'} gap={'10px'} justifyContent={'center'} alignItems={'center'}>
                                 <Button backgroundColor={'green.400'} onClick={() => handleUpdateDataModal("open", book)}>Update</Button>
                                 <Button backgroundColor={'red.500'} onClick={() => handleDeleteModal("open", book)}>Delete</Button>

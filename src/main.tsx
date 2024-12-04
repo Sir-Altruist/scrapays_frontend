@@ -8,13 +8,13 @@ import { ChakraProvider, defaultSystem } from '@chakra-ui/react'
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client'
 
 /** Configure Apollo Client */
-const token = localStorage.getItem('access_token') || ''
+// const token = localStorage.getItem('access_token') || ''
 export const client = new ApolloClient({
   uri: import.meta.env.VITE_API_URL,
   cache: new InMemoryCache(),
-  headers: {
-    Authorization: `Bearer ${token}`
-  }
+  // headers: {
+  //   Authorization: `Bearer ${token}`
+  // }
 })
 
 createRoot(document.getElementById('root')!).render(

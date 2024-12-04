@@ -12,7 +12,7 @@ import { Field } from "@/components/ui/field"
 import { useMutation } from '@apollo/client';
 import { SIGN_UP } from '@/api/auth';
 import { Alert } from '@/components/ui/alert';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 
 // Signup DTO Interface
@@ -23,14 +23,16 @@ export interface SignUpDto {
   
   // Signup Response Interface
   export interface SignUpResponse {
-    user: {
-      id: string;
-      email: string;
-      username: string;
-    };
-    message: string;
-    code: number;
-    status: string;
+    signUp: {
+        user: {
+          id: string;
+          email: string;
+          username: string;
+        };
+        message: string;
+        code: number;
+        status: string;
+    }
   }
   
   // Mutation Hook Type
@@ -45,17 +47,29 @@ const Signup: React.FC = () => {
         name: ''
     })
     const [display, setDisplay] = useState(false)
-    const { email, name } = userData
+    const { email, name } = userData;
+    const navigate = useNavigate()
     const [signup, { error }] = useMutation<SignUpResponse, SignUpMutationVariables>(SIGN_UP)
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         try {
             setLoading(true)
-            await signup({
+            const result = await signup({
                 variables: {
                   signUpDto: { email, name }
                 }
             });
+
+            if(result?.data?.signUp?.status === "success"){
+                setDisplay(true)
+                setTimeout(() => setDisplay(false), 4000)
+                setTimeout(() => navigate('/login'), 4500)
+                setUserData(prev => ({
+                    ...prev,
+                    email: '',
+                    name: ''
+                }))
+            }
         } catch (error) {
             setDisplay(true)
             setTimeout(() => setDisplay(false), 3000)
@@ -73,7 +87,7 @@ const Signup: React.FC = () => {
     
   return (
     <Box width={'100%'} height={'100%'} paddingTop={'150px'}>
-        {display && <Alert width={'400px'} margin={'0 auto 20px'} status="error">{error?.message}</Alert>}
+        {display && <Alert width={'400px'} margin={'0 auto 20px'} status={error ? "error" : "success"}>{error ? error?.message : "Registration Successful! Kindly verify your email to continue"}</Alert>}
         <Box 
             background={'white'} 
             width={"400px"} 
