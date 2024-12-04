@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+
 #root {
   background-color: #EFF5FF;
   margin: 0;
@@ -5,4 +8,5 @@
   box-sizing: border-box;
   scroll-behavior: smooth;
   min-height: 100vh;
+  font-family: "Open Sans", sans-serif;
 }

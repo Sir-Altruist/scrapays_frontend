@@ -16,44 +16,15 @@ import { Alert } from '@/components/ui/alert';
 import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
 import Logo from "../assets/icon.png"
+import { 
+  OtpMutationVariables, 
+  OtpResponse, 
+  SignInMutationVariables, 
+  SignInResponse 
+} from '@/interfaces';
 
 
-// Signup DTO Interface
-export interface SignInDto {
-  email: string;
-  code: string;
-}
 
-export interface OtpDto {
-  email: string;
-}
-
-  
-  // Signup Response Interface
-  export interface SignInResponse {
-    signIn: {
-      token: string;
-      message: string;
-      code: number;
-      status: string;
-    }
-  }
-  export interface OtpResponse {
-    sendOtp: {
-      message: string;
-      code: number;
-      status: string;
-    }
-  }
-  
-  // Mutation Hook Type
-  export interface SignInMutationVariables {
-    signInDto: SignInDto;
-  }
-
-  export interface OtpMutationVariables {
-    otpDto: OtpDto;
-  }
 const Signup: React.FC = () => {
     const [loading, setLoading] = useState(false)
     const [userData, setUserData] = useState({
@@ -117,7 +88,8 @@ const Signup: React.FC = () => {
     }
     
   return (
-    <Box width={'100%'} height={'100%'} paddingTop={'200px'}>
+    <Box width={'100%'} height={'100%'} paddingTop={'150px'}>
+        <Image src={Logo} alt='logo' width={'70px'} height={'70px'} margin={'10px auto 20px'} shadow={"rgba(149, 157, 165, 0.2) 0px 8px 24px"} />
         {(error || otpError) && display && <Alert width={'400px'} margin={'0 auto 20px'} status={data ? "success" : "error"}>{otpSent ? error?.message : otpError?.message}</Alert>}
         {data && display &&  <Alert width={'400px'} margin={'0 auto 20px'} status={"success"}>{data?.signIn?.message}</Alert>}
         <Box 
@@ -129,11 +101,12 @@ const Signup: React.FC = () => {
             p={8} 
             borderWidth={1} 
             borderRadius={8} 
+            borderColor={'#e3e3e3'}
             margin={'0 auto'}
-            boxShadow="lg"
+            boxShadow="xl"
         >
-        <Heading mb={2}  textAlign={'center'} color={'black'}>Welcome to Scrapays Bookstore</Heading>
-        <Image src={Logo} alt='logo' width={'60px'} height={'60px'} margin={'10px auto'} />
+        <Heading mb={1} as={'h1'} fontSize={'19px'} textAlign={'center'} color={'#0842A6'}>Welcome Back</Heading>
+        <Text mb={2} as={'p'} fontSize={'14px'} textAlign={'center'} color={'#989da6'}>Enter your credentials to access your account</Text>
         <form style={{ margin: '30px 0 10px'}}>
             <Stack spaceY={2}>
                 <Field>
@@ -145,6 +118,7 @@ const Signup: React.FC = () => {
                         onChange={e => handleChange(e)}
                         value={email}
                         color={'black'}
+                        fontSize={'14px'}
                      />
                 </Field>
                 {
@@ -158,6 +132,7 @@ const Signup: React.FC = () => {
                         onChange={e => handleChange(e)}
                         value={code}
                         color={'black'}
+                        fontSize={'14px'}
                         />
                     </Field>
                   )
@@ -169,7 +144,7 @@ const Signup: React.FC = () => {
                     type={"button"} 
                     backgroundColor={'#0842A6'} 
                     width="full" 
-                    size={'xl'}
+                    size={"md"}
                     onClick={otpSent ? handleSubmit : handleOtp}
                     >
                       {otpSent ? "Login" : "Send Otp"}
@@ -177,7 +152,7 @@ const Signup: React.FC = () => {
                 }
             </Stack>
           </form>
-          <Text as={'p'} color={'black'}>Do not have an account yet? <Link to={'/'} style={{ color: "#0842A6", textDecoration: "underline"}}>Register here</Link></Text>
+          <Text as={'p'} textAlign={'center'} fontSize={'14px'} color={'#989da6'}>Do not have an account yet? <Link to={'/'} style={{ color: "#0842A6", textDecoration: "underline"}}>Register here</Link></Text>
         </Box>
     </Box>
   );

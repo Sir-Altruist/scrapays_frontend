@@ -15,32 +15,11 @@ import { SIGN_UP } from '@/api/auth';
 import { Alert } from '@/components/ui/alert';
 import { Link, useNavigate } from 'react-router-dom';
 import Logo from "../assets/icon.png"
+import { 
+    SignUpMutationVariables, 
+    SignUpResponse 
+} from '@/interfaces';
 
-
-// Signup DTO Interface
-export interface SignUpDto {
-    email: string;
-    name: string;
-  }
-  
-  // Signup Response Interface
-  export interface SignUpResponse {
-    signUp: {
-        user: {
-          id: string;
-          email: string;
-          username: string;
-        };
-        message: string;
-        code: number;
-        status: string;
-    }
-  }
-  
-  // Mutation Hook Type
-  export interface SignUpMutationVariables {
-    signUpDto: SignUpDto;
-  }
 
 const Signup: React.FC = () => {
     const [loading, setLoading] = useState(false)
@@ -64,8 +43,8 @@ const Signup: React.FC = () => {
 
             if(result?.data?.signUp?.status === "success"){
                 setDisplay(true)
-                setTimeout(() => setDisplay(false), 4000)
-                setTimeout(() => navigate('/login'), 4500)
+                setTimeout(() => setDisplay(false), 5000)
+                setTimeout(() => navigate('/login'), 5500)
                 setUserData(prev => ({
                     ...prev,
                     email: '',
@@ -89,6 +68,7 @@ const Signup: React.FC = () => {
     
   return (
     <Box width={'100%'} height={'100%'} paddingTop={'150px'}>
+        <Image src={Logo} alt='logo' width={'60px'} height={'60px'} margin={'10px auto 20px'} />
         {display && <Alert width={'400px'} margin={'0 auto 20px'} status={error ? "error" : "success"}>{error ? error?.message : "Registration Successful! Kindly verify your email to continue"}</Alert>}
         <Box 
             background={'white'} 
@@ -101,8 +81,8 @@ const Signup: React.FC = () => {
             margin={'0 auto'}
             boxShadow="lg"
         >
-        <Heading mb={2}  textAlign={'center'} color={'black'}>Welcome to Scrapays Bookstore</Heading>
-        <Image src={Logo} alt='logo' width={'60px'} height={'60px'} margin={'10px auto'} />
+        <Heading mb={1} as={'h1'} fontSize={'19px'} textAlign={'center'} color={'#0842A6'}>Welcome to Scrapays Bookstore</Heading>
+        <Text mb={2} as={'p'} fontSize={'14px'} textAlign={'center'} color={'#989da6'}>Enter your credentials to create an account</Text>
         <form onSubmit={handleSubmit} style={{ margin: '30px 0 10px'}}>
             <Stack spaceY={2}>
                 <Field>
@@ -114,6 +94,7 @@ const Signup: React.FC = () => {
                         onChange={e => handleChange(e)}
                         value={email}
                         color={'black'}
+                        fontSize={'14px'}
                      />
                 </Field>
                 <Field>
@@ -125,16 +106,17 @@ const Signup: React.FC = () => {
                     onChange={e => handleChange(e)}
                     value={name}
                     color={'black'}
+                    fontSize={'14px'}
                      />
                 </Field>
                 {
                     loading ? 
-                    <Button backgroundColor={'#0842A6'} width="full" size={'xl'}><Spinner color={'white'} /></Button> : 
-                    <Button type="submit" backgroundColor={'#0842A6'} width="full" size={'xl'}>Register</Button>
+                    <Button backgroundColor={'#0842A6'} width="full" size={'md'}><Spinner color={'white'} /></Button> : 
+                    <Button type="submit" backgroundColor={'#0842A6'} width="full" size={'md'}>Register</Button>
                 }
             </Stack>
         </form>
-        <Text as={'p'} color={'black'} textAlign={'center'}>Already have an account? <Link style={{ color: "#0842A6", textDecoration: "underline"}} to={'/login'}>Login here</Link></Text>
+        <Text as={'p'} color={'#989da6'} fontSize={'14px'} textAlign={'center'}>Already have an account? <Link style={{ color: "#0842A6", textDecoration: "underline"}} to={'/login'}>Login here</Link></Text>
         </Box>
     </Box>
   );
