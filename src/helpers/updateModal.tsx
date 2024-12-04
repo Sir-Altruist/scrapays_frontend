@@ -78,6 +78,11 @@ export const Modal = ({ open, handleModal, existingData }: any) => {
     }, [existingData]);
 
     const handleUpdate = async () => {
+      const token = localStorage.getItem('access_token')
+        if(!token){
+          navigate('/login')
+          return;
+        }
         try {
             setLoading(true)
             const result = await updateBook({
@@ -85,6 +90,11 @@ export const Modal = ({ open, handleModal, existingData }: any) => {
                   id: existingData?.id,
                   updateInput: { name, description }
                 },
+                context: {
+                  headers: {
+                    Authorization: `Bearer ${token}`
+                  }
+                }
             })
             if(result?.errors?.['code'] === 403){
               localStorage.removeItem('access_token')
@@ -92,8 +102,8 @@ export const Modal = ({ open, handleModal, existingData }: any) => {
             }
             if(result?.data) {
                 setDisplay(true)
-                setTimeout(() => setDisplay(false), 4000)
-                setTimeout(() => navigate(0), 5000)
+                setTimeout(() => setDisplay(false), 3000)
+                setTimeout(() => navigate(0), 3500)
             }
         } catch (error) {
             setDisplay(true)
@@ -103,7 +113,7 @@ export const Modal = ({ open, handleModal, existingData }: any) => {
         }
     }
   return (
-          <DialogRoot size={"sm"} open={open}>
+          <DialogRoot size={"sm"} open={open} onOpenChange={() => handleModal("close")}>
             <DialogBackdrop />
             <DialogContent>
               <DialogHeader>

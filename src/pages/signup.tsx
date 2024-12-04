@@ -6,13 +6,15 @@ import {
   Input,
   Heading,
   Stack,
-  Text
+  Text,
+  Image
 } from '@chakra-ui/react';
 import { Field } from "@/components/ui/field"
 import { useMutation } from '@apollo/client';
 import { SIGN_UP } from '@/api/auth';
 import { Alert } from '@/components/ui/alert';
 import { Link, useNavigate } from 'react-router-dom';
+import Logo from "../assets/icon.png"
 
 
 // Signup DTO Interface
@@ -91,7 +93,6 @@ const Signup: React.FC = () => {
         <Box 
             background={'white'} 
             width={"400px"} 
-            height={'400px'} 
             paddingTop={'100px'}
             color="white" 
             p={8} 
@@ -101,8 +102,8 @@ const Signup: React.FC = () => {
             boxShadow="lg"
         >
         <Heading mb={2}  textAlign={'center'} color={'black'}>Welcome to Scrapays Bookstore</Heading>
-        <Heading mb={6} textAlign={'center'} color={'black'}>Sign up</Heading>
-        <form onSubmit={handleSubmit} style={{ margin: '50px 0 10px'}}>
+        <Image src={Logo} alt='logo' width={'60px'} height={'60px'} margin={'10px auto'} />
+        <form onSubmit={handleSubmit} style={{ margin: '30px 0 10px'}}>
             <Stack spaceY={2}>
                 <Field>
                     <Input 

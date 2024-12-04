@@ -5,14 +5,14 @@ import { gql } from "@apollo/client"
 export const SIGN_UP = gql`
     mutation SignUp($signUpDto: SignUpDto!) {
         signUp(signUpDto: $signUpDto) {
-        user {
-            id
-            email
-            username
-        }
-        message
-        code
-        status
+            user {
+                id
+                email
+                username
+            }
+            message
+            code
+            status
         }
     }
 `;
@@ -36,4 +36,18 @@ export const SEND_OTP = gql`
             code
         }
     }
+`;
+
+export const FETCH_PROFILE = gql`
+    query FetchProfile {
+        fetchProfile {
+            user {
+                username
+            }
+            message
+            status
+            code
+        }
+    }
+
 `;

@@ -36,21 +36,31 @@ const Modal = ({ handleModal, open, existingData }) => {
     const navigate = useNavigate()
 
     const handleDelete = async () => {
+      const token = localStorage.getItem('access_token')
+        if(!token){
+          navigate('/login')
+          return;
+        }
         try {
             setLoading(true)
             const result = await deleteBook({
                 variables: {
                   id: existingData?.id
                 },
+                context: {
+                  headers: {
+                    Authorization: `Bearer ${token}`
+                  }
+                }
             })
-            if(result?.errors?.['code'] === 403){
+            if(result?.errors?.['code'] === 403 || error?.cause?.['code'] === 401){
               localStorage.removeItem('access_token')
               navigate('/login')
             }
             if(result?.data) {
                 setDisplay(true)
                 setTimeout(() => setDisplay(false), 3000)
-                setTimeout(() => navigate(0), 4000)
+                setTimeout(() => navigate(0), 3500)
             }
         } catch (error) {
             setDisplay(true)
@@ -60,7 +70,7 @@ const Modal = ({ handleModal, open, existingData }) => {
         }
     }
   return (
-    <DialogRoot open={open}>
+    <DialogRoot open={open} onOpenChange={() => handleModal("close")}>
         <DialogBackdrop />
       <DialogContent>
         <DialogHeader>
